@@ -1,0 +1,158 @@
+{
+  "name": "Fetch Candidate",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "fetch-candidate",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "6e47c069-25c4-4bbd-8ff3-830b5267a912",
+      "name": "Webhook - Fetch Candidate",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        288
+      ],
+      "webhookId": "fetch-candidate-001"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1QS5I-w0v3TzCNi5tQlO4ywKuh__DAdlni_t50N3Kw8Q",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 790399228,
+          "mode": "list",
+          "cachedResultName": "Candidates_sample",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QS5I-w0v3TzCNi5tQlO4ywKuh__DAdlni_t50N3Kw8Q/edit#gid=790399228"
+        },
+        "options": {}
+      },
+      "id": "a76a7f77-b0d6-47ea-9502-303a47e5dcc1",
+      "name": "Google Sheets - Lookup Candidate",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        -416,
+        288
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "m0msB3TtFfMMdMMc",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.Status }}",
+              "operation": "contains",
+              "value2": "Selected for Interview"
+            }
+          ]
+        }
+      },
+      "id": "7dac6d42-7432-4aec-928d-91d4bb14a555",
+      "name": "IF - Candidate Approved",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"candidate\": {\n    \"name\": \"{{ $json.Name }}\",\n    \"email\": \"{{ $json.Email }}\",\n    \"position\": \"{{ $json.Position }}\",\n    \"experience\": \"{{ $json.Experience }}\",\n    \"skills\": \"{{ $json.Skills }}\"\n  }\n}",
+        "options": {}
+      },
+      "id": "caa532ac-efb2-42bb-a4fa-d83c41700ef8",
+      "name": "Respond - Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": false,\n  \"message\": \"Candidate not found or not approved for interview\"\n}",
+        "options": {}
+      },
+      "id": "4181c540-646e-493d-811f-f1bbbd9e9e4c",
+      "name": "Respond - Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        384
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook - Fetch Candidate": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Lookup Candidate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Lookup Candidate": {
+      "main": [
+        [
+          {
+            "node": "IF - Candidate Approved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Candidate Approved": {
+      "main": [
+        [
+          {
+            "node": "Respond - Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond - Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ec612176-49a4-4a5c-95bd-ec762084ec09",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "wnBMIV1waglkEi4n",
+  "tags": []
+}

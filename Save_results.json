@@ -1,0 +1,220 @@
+{
+  "name": "Save_results",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "save-results",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "3ca292cf-59c2-4fbc-bffd-0211d43b82cf",
+      "name": "Webhook - Save Results",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        -112
+      ],
+      "webhookId": "save-results-001"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare data for Google Sheets\nconst data = $input.first().json.body;\n\n// Format Q&A pairs as text\nconst qaText = data.questions_answers.map((qa, i) => \n  `Q${i+1}: ${qa.question}\\nA${i+1}: ${qa.answer}\\n`\n).join('\\n');\n\n// Format scores\nconst scoresText = data.scores.map((s, i) => \n  `Q${i+1}: ${s.score}/10 (${s.sentiment})`\n).join(', ');\n\nreturn {\n  json: {\n    candidate_name: data.candidate_name,\n    candidate_email: data.candidate_email,\n    position: data.position,\n    interview_date: new Date(data.interview_date).toLocaleString(),\n    average_score: data.average_score,\n    overall_assessment: data.overall_assessment,\n    status: data.status,\n    next_step: data.next_step,\n    qa_transcript: qaText,\n    scores_summary: scoresText,\n    full_data: JSON.stringify(data, null, 2)\n  }\n};"
+      },
+      "id": "781f44e7-a80f-475f-b8a3-6155306673f2",
+      "name": "Code - Format Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1zuuyWW9snXzMziliy7qyCqT7xoMgiz6cQ6yRm4GFm9g",
+          "mode": "list",
+          "cachedResultName": "Result Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1zuuyWW9snXzMziliy7qyCqT7xoMgiz6cQ6yRm4GFm9g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1zuuyWW9snXzMziliy7qyCqT7xoMgiz6cQ6yRm4GFm9g/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Position",
+              "displayName": "Position",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Average Score",
+              "displayName": "Average Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Assessment",
+              "displayName": "Assessment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Next Step",
+              "displayName": "Next Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Full Transcript",
+              "displayName": "Full Transcript",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "27562e0c-b09b-472f-85bd-13a0885f33bf",
+      "name": "Google Sheets - Append Results",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        112,
+        -112
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "m0msB3TtFfMMdMMc",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"message\": \"Interview results saved successfully\",\n  \"candidate\": \"{{ $('Code - Format Data').first().json.candidate_name }}\",\n  \"score\": {{ $('Code - Format Data').first().json.average_score }}\n}",
+        "options": {}
+      },
+      "id": "c0d5f486-a235-4088-b1ce-34dc06ea0508",
+      "name": "Respond - Saved",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        320,
+        -112
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook - Save Results": {
+      "main": [
+        [
+          {
+            "node": "Code - Format Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Format Data": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Append Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Append Results": {
+      "main": [
+        [
+          {
+            "node": "Respond - Saved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "21ad96f0-e1cf-42fc-a7a2-335a44a0f4c6",
+  "meta": {
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "TkiiDnnpE0JW3XD3",
+  "tags": []
+}

@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>AI Interviewer – Simple UI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root { --bg:#0b0f14; --panel:#121821; --muted:#95a3b8; --text:#e6e9ef; --border:#1f2a37; --accent:#2563eb;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,Segoe UI,Roboto,Arial}
+  .wrap{max-width:900px;margin:24px auto;padding:0 16px}
+  h1{font-size:22px;margin:12px 0 20px;text-align:center}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;margin:14px 0}
+  label{display:block;font-size:13px;color:var(--muted);margin:8px 0 6px}
+  input,textarea,button{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0f141b;color:var(--text)}
+  textarea{resize:vertical}
+  button{background:var(--accent);border:none;font-weight:600;cursor:pointer}
+  button.secondary{background:#1f2937}
+  button:disabled{opacity:.6;cursor:not-allowed}
+  .pills{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+  .pill{border:1px solid var(--border);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--muted)}
+  .chat{background:#0c1219;border:1px solid #263246;border-radius:12px;min-height:220px;max-height:380px;overflow:auto;padding:10px}
+  .msg{margin:8px 0;line-height:1.35}
+  .msg.q{color:#93c5fd}
+  .msg.a{color:#f9fafb}
+  .row{display:flex;gap:8px}
+  .right{margin-left:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>💬 AI Interviewer Chatbot</h1>
+
+  <!-- Step 1: Email input only -->
+  <div class="card">
+    <label>Candidate Email</label>
+    <input id="email" placeholder="asha@example.com" />
+    <div class="row" style="margin-top:10px">
+      <button id="btnFetch">Fetch Candidate</button>
+      <button id="btnReset" class="secondary right">Reset</button>
+    </div>
+    <div id="cand" class="pills"></div>
+  </div>
+
+  <!-- Step 2: Generate Questions -->
+  <div class="card">
+    <label>Job Description (optional)</label>
+    <textarea id="jd" rows="4" placeholder="Paste JD here (optional; used to tailor questions)"></textarea>
+    <button id="btnGen" style="margin-top:10px">Generate Questions</button>
+  </div>
+
+  <!-- Step 3: Interview Chat -->
+  <div class="card">
+    <div class="pills">
+      <span class="pill" id="pillStep">Waiting…</span>
+      <span class="pill" id="pillScore">Avg: 0/10</span>
+    </div>
+    <div id="chat" class="chat"></div>
+    <div class="row" style="margin-top:10px">
+      <input id="answer" placeholder="Type your answer and press Send…" />
+      <button id="btnSend">Send</button>
+      <button id="btnFinish" class="secondary">Finish & Save</button>
+    </div>
+    <div id="saveRes" style="margin-top:8px"></div>
+  </div>
+</div>
+
+<script>
+  // ✅ Your live n8n webhook URLs
+  const WEBHOOKS = {
+    fetch: "https://one-organic-anemone.ngrok-free.app/webhook-test/fetch-candidate",
+    generate: "https://one-organic-anemone.ngrok-free.app/webhook-test/generate-questions",
+    save: "https://one-organic-anemone.ngrok-free.app/webhook-test/save-results"
+  };
+
+  const el = id => document.getElementById(id);
+  const chat = el('chat');
+  const state = { candidate: null, questions: [], i: 0, qa: [], scores: [], avg: 0 };
+
+  function addMsg(text, cls){
+    const d = document.createElement('div');
+    d.className = 'msg ' + (cls || '');
+    d.textContent = text;
+    chat.appendChild(d);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  function keywordScore(answer, keywords){
+    const a = (answer || '').toLowerCase();
+    const hits = (keywords || []).filter(k => a.includes(k.toLowerCase())).length;
+    const pos = ["optimized","resolved","scalable","secure","improved","collaborated"];
+    const neg = ["stuck","failed","blocked","delay","buggy"];
+    let delta = 0;
+    if (pos.some(w => a.includes(w))) delta += 1;
+    if (neg.some(w => a.includes(w))) delta -= 1;
+    const score = Math.min(10, Math.max(0, 2*hits + 2 + delta));
+    const sentiment = delta>0 ? "positive" : delta<0 ? "negative" : "neutral";
+    return { score, sentiment, hits };
+  }
+
+  function setAvg(){
+    const s = state.scores.reduce((a,b)=>a+(b.score||0),0);
+    state.avg = state.scores.length ? Math.round((10*s/state.scores.length))/10 : 0;
+    el('pillScore').textContent = `Avg: ${state.avg}/10`;
+  }
+
+  function showNextQ(){
+    if (state.i >= state.questions.length){
+      addMsg("✅ Interview complete. Click 'Finish & Save'.","q");
+      el('pillStep').textContent = "Complete";
+      return;
+    }
+    const q = state.questions[state.i].q;
+    addMsg(`Q${state.i+1}: ${q}`,"q");
+    el('pillStep').textContent = `Question ${state.i+1} of ${state.questions.length}`;
+  }
+
+  el('btnFetch').onclick = async ()=>{
+    const email = el('email').value.trim();
+    if (!email) return alert("Please enter candidate email.");
+    try{
+      const res = await fetch(WEBHOOKS.fetch,{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ email })
+      });
+      const j = await res.json();
+      if (!j.success){ el('cand').innerHTML = `<span class="pill">❌ ${j.message||'Not found'}</span>`; return; }
+      state.candidate = j.candidate;
+      el('cand').innerHTML = `
+        <span class="pill">Name: ${state.candidate.name||'-'}</span>
+        <span class="pill">Email: ${state.candidate.email||'-'}</span>
+        <span class="pill">Position: ${state.candidate.position||'-'}</span>`;
+    }catch(err){ alert("Fetch error: "+err.message); }
+  };
+
+  el('btnGen').onclick = async ()=>{
+    if (!state.candidate) return alert("Fetch candidate first.");
+    const body = {
+      name: state.candidate.name,
+      position: state.candidate.position || 'Software Engineer',
+      experience: state.candidate.experience || '0',
+      skills: state.candidate.skills || '',
+      job_description: el('jd').value || ''
+    };
+    try{
+      const res = await fetch(WEBHOOKS.generate,{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(body)
+      });
+      const j = await res.json();
+      if (!j.success || !Array.isArray(j.questions)) { alert("Failed to generate questions."); return; }
+      state.questions = j.questions; state.i=0; state.qa=[]; state.scores=[];
+      chat.innerHTML=''; addMsg(`👋 Hello ${state.candidate.name||'Candidate'}! We'll go through ${state.questions.length} questions.`,"q");
+      showNextQ();
+    }catch(err){ alert("Error generating: "+err.message); }
+  };
+
+  el('btnSend').onclick = ()=>{
+    if (state.i >= state.questions.length) return;
+    const ans = el('answer').value.trim(); if (!ans) return;
+    const qObj = state.questions[state.i];
+    addMsg(ans,"a");
+    const sc = keywordScore(ans,qObj.keywords);
+    state.qa.push({question:qObj.q,answer:ans,keywordsMatched:sc.hits,sentiment:sc.sentiment,score:sc.score});
+    state.scores.push(sc);
+    setAvg();
+    state.i++; el('answer').value=''; showNextQ();
+  };
+
+  el('btnFinish').onclick = async ()=>{
+    if (!state.candidate) return alert("No candidate loaded.");
+    const payload = {
+      candidate_name: state.candidate.name,
+      candidate_email: state.candidate.email,
+      position: state.candidate.position,
+      interview_date: new Date().toISOString(),
+      average_score: state.avg,
+      overall_assessment: state.avg>=8?"Excellent":state.avg>=6?"Good":state.avg>=4?"Fair":"Needs Improvement",
+      status: state.avg>=6?"Proceed":"Hold",
+      next_step: state.avg>=6?"Schedule Panel Interview":"Keep in Pipeline",
+      questions_answers: state.qa,
+      scores: state.scores
+    };
+    try{
+      const r = await fetch(WEBHOOKS.save,{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(payload)
+      });
+      const j = await r.json();
+      el('saveRes').innerHTML = j.success ? 
+        `✅ Saved for <b>${j.candidate||state.candidate.name}</b> (Avg ${state.avg}/10)` :
+        `❌ Save failed: ${j.message||'Unknown error'}`;
+    }catch(err){ el('saveRes').innerHTML = '❌ Save error: '+err.message; }
+  };
+
+  el('btnReset').onclick = ()=>{
+    Object.assign(state,{candidate:null,questions:[],i:0,qa:[],scores:[],avg:0});
+    el('email').value=''; el('cand').innerHTML=''; chat.innerHTML=''; el('saveRes').innerHTML='';
+    el('pillStep').textContent='Waiting…'; el('pillScore').textContent='Avg: 0/10';
+  };
+
+  el('answer').addEventListener('keydown', e=>{
+    if(e.key==='Enter'){ e.preventDefault(); el('btnSend').click(); }
+  });
+</script>
+</body>
+</html>
