@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>AI Engineering From Scratch — Learning Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="An end-to-end learning dashboard for rohitg00/ai-engineering-from-scratch: 20 phases, 523 lessons, tracked locally as you go." />
+<style>
+  :root {
+    color-scheme: dark;
+    --surface-1: #1a1a19;
+    --page: #0d0d0d;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #898781;
+    --border: rgba(255,255,255,0.10);
+    --grid: #2c2c2a;
+    --track: #2c2c2a;
+    --series-1: #3987e5;      /* sequential blue, dark step */
+    --series-1-light: #1c5cab; /* deeper step for hover */
+    --good: #0ca30c;
+    --card: #141413;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      color-scheme: light;
+      --surface-1: #fcfcfb;
+      --page: #f9f9f7;
+      --text-primary: #0b0b0b;
+      --text-secondary: #52514e;
+      --text-muted: #898781;
+      --border: rgba(11,11,11,0.10);
+      --grid: #e1e0d9;
+      --track: #e1e0d9;
+      --series-1: #2a78d6;
+      --series-1-light: #6da7ec;
+      --good: #0ca30c;
+      --card: #ffffff;
+    }
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --surface-1: #fcfcfb;
+    --page: #f9f9f7;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #898781;
+    --border: rgba(11,11,11,0.10);
+    --grid: #e1e0d9;
+    --track: #e1e0d9;
+    --series-1: #2a78d6;
+    --series-1-light: #6da7ec;
+    --good: #0ca30c;
+    --card: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--page);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 24px 16px 64px; }
+
+  .topnav { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+  .topnav a { color: var(--text-secondary); text-decoration: none; font-size: 13px; }
+  .topnav a:hover { color: var(--text-primary); }
+  .topnav .brand { font-weight: 600; color: var(--text-primary); font-size: 14px; }
+  .themebtn {
+    background: none; border: 1px solid var(--border); color: var(--text-secondary);
+    border-radius: 8px; padding: 5px 10px; font-size: 12px; cursor: pointer;
+  }
+
+  header.hero { margin: 8px 0 28px; }
+  header.hero h1 { font-size: 26px; margin: 0 0 8px; }
+  header.hero p { color: var(--text-secondary); font-size: 14px; line-height: 1.5; max-width: 640px; margin: 0; }
+  header.hero .credit { margin-top: 10px; font-size: 12.5px; color: var(--text-muted); }
+  header.hero .credit a { color: var(--text-secondary); }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin: 20px 0 32px; }
+  .stat-tile {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 14px 12px;
+  }
+  .stat-tile .value { font-size: 26px; font-weight: 600; line-height: 1.1; }
+  .stat-tile .label { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+  .progress-panel {
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 18px; margin-bottom: 28px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  }
+  .progress-panel .figure { font-size: 40px; font-weight: 600; min-width: 90px; }
+  .progress-panel .meter-wrap { flex: 1; min-width: 200px; }
+  .progress-panel .meter-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .meter-track { height: 10px; border-radius: 6px; background: var(--track); overflow: hidden; }
+  .meter-fill { height: 100%; border-radius: 6px; background: var(--good); transition: width .25s ease; }
+  .progress-panel .reset { font-size: 12px; color: var(--text-muted); background: none; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+
+  h2.section-title { font-size: 16px; margin: 32px 0 6px; }
+  p.section-sub { font-size: 13px; color: var(--text-secondary); margin: 0 0 14px; }
+
+  .view-toggle { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; }
+  .view-toggle summary { cursor: pointer; }
+
+  table.data-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 10px 0 20px; }
+  table.data-table th, table.data-table td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--grid); }
+  table.data-table th { color: var(--text-secondary); font-weight: 500; }
+  table.data-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  .phase-list { display: flex; flex-direction: column; gap: 8px; }
+  .phase-row {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 12px 14px; display: grid; grid-template-columns: auto 1fr auto; gap: 10px 16px; align-items: center;
+  }
+  .phase-row.done { border-color: var(--good); }
+  .phase-check {
+    width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border);
+    background: var(--track); display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 15px; color: var(--text-muted); flex: none; user-select: none;
+  }
+  .phase-row.done .phase-check { background: var(--good); border-color: var(--good); color: #fff; }
+  .phase-main { min-width: 0; grid-column: 2; }
+  .phase-title-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .phase-num { font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+  .phase-title { font-size: 14.5px; font-weight: 600; }
+  .phase-desc { font-size: 12.5px; color: var(--text-secondary); margin: 3px 0 8px; }
+  .phase-bar-row { display: flex; align-items: center; gap: 8px; }
+  .phase-bar-track { flex: 1; height: 14px; border-radius: 4px; background: var(--track); overflow: hidden; }
+  .phase-bar-fill { height: 100%; border-radius: 4px; background: var(--series-1); }
+  .phase-bar-value { font-size: 12px; color: var(--text-secondary); white-space: nowrap; min-width: 70px; text-align: right; }
+  .phase-link { grid-column: 3; font-size: 12px; color: var(--text-secondary); text-decoration: none; white-space: nowrap; }
+  .phase-link:hover { color: var(--text-primary); }
+
+  .tracks { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 28px; }
+  .track-chip {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px;
+    padding: 7px 12px; border-radius: 999px; border: 1px solid var(--border);
+    color: var(--text-secondary); text-decoration: none; background: var(--card);
+  }
+  .track-chip:hover { color: var(--text-primary); border-color: var(--series-1); }
+
+  footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-muted); }
+  footer a { color: var(--text-secondary); }
+
+  @media (max-width: 560px) {
+    .phase-row { grid-template-columns: auto 1fr; }
+    .phase-link { grid-column: 2; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="topnav">
+    <span class="brand">AI Interviewer</span>
+    <div style="display:flex; align-items:center; gap:14px;">
+      <a href="index.html">&larr; Back to app</a>
+      <a href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Source repo ↗</a>
+      <button class="themebtn" id="themeToggle" type="button">Toggle theme</button>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <h1>AI Engineering From Scratch — Learning Dashboard</h1>
+    <p>
+      A single page to track your progress through
+      <a href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">rohitg00/ai-engineering-from-scratch</a>,
+      an open-source, MIT-licensed curriculum that takes you from math foundations to
+      multi-agent production systems — end to end, by building.
+    </p>
+    <p class="credit">
+      Curriculum and lesson content © the
+      <a href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">ai-engineering-from-scratch</a>
+      project (MIT License). This page only tracks your progress through it — checkbox
+      state is saved in this browser only, nothing is uploaded.
+    </p>
+  </header>
+
+  <section class="stats">
+    <div class="stat-tile"><div class="value">523</div><div class="label">Lessons</div></div>
+    <div class="stat-tile"><div class="value">20</div><div class="label">Phases</div></div>
+    <div class="stat-tile"><div class="value">~342h</div><div class="label">Est. hours</div></div>
+    <div class="stat-tile"><div class="value">12</div><div class="label">Role tracks</div></div>
+    <div class="stat-tile"><div class="value">4</div><div class="label">Languages</div></div>
+    <div class="stat-tile"><div class="value">MIT</div><div class="label">License</div></div>
+  </section>
+
+  <section class="progress-panel">
+    <div class="figure" id="progressFigure">0%</div>
+    <div class="meter-wrap">
+      <div class="meter-label"><span>Phases marked complete</span><span id="progressCount">0 / 20</span></div>
+      <div class="meter-track"><div class="meter-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+    <button class="reset" id="resetProgress" type="button">Reset progress</button>
+  </section>
+
+  <h2 class="section-title">Curriculum, phase by phase</h2>
+  <p class="section-sub">
+    Bar length shows lesson count per phase (523 total). Tap the circle to mark a phase
+    complete as you go — the summary above updates from your local checkmarks.
+  </p>
+
+  <details class="view-toggle">
+    <summary>View as table</summary>
+    <table class="data-table">
+      <thead><tr><th>#</th><th>Phase</th><th class="num">Lessons</th></tr></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </details>
+
+  <div class="phase-list" id="phaseList"></div>
+
+  <h2 class="section-title">Role-based learning paths</h2>
+  <p class="section-sub">Curated sequences through the same lessons, aimed at a specific job.</p>
+  <div class="tracks" id="trackList"></div>
+
+  <footer>
+    Built on top of
+    <a href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">rohitg00/ai-engineering-from-scratch</a>
+    (MIT License) · live course site:
+    <a href="https://aiengineeringfromscratch.com" target="_blank" rel="noopener">aiengineeringfromscratch.com</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var REPO = "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/";
+  var STORAGE_KEY = "aefs-dashboard-progress-v1";
+
+  var phases = [
+    ["00-setup-and-tooling", "Phase 0 · Setup & Tooling", "Get your environment ready for everything that follows.", 12],
+    ["01-math-foundations", "Phase 1 · Math Foundations", "The intuition behind every AI algorithm, through code, not textbooks.", 22],
+    ["02-ml-fundamentals", "Phase 2 · ML Fundamentals", "Classical machine learning is still the backbone of most production AI.", 18],
+    ["03-deep-learning-core", "Phase 3 · Deep Learning Core", "Neural networks from first principles. No frameworks until you build one yourself.", 13],
+    ["04-computer-vision", "Phase 4 · Computer Vision", "From pixels to understanding across image, video, and 3D.", 28],
+    ["05-nlp-foundations-to-advanced", "Phase 5 · NLP, Foundations to Advanced", "Language is the interface to intelligence. Master every layer.", 29],
+    ["06-speech-and-audio", "Phase 6 · Speech & Audio", "The other half of human communication. Hear, understand, speak.", 17],
+    ["07-transformers-deep-dive", "Phase 7 · Transformers Deep Dive", "The architecture that changed everything. Understand every layer.", 16],
+    ["08-generative-ai", "Phase 8 · Generative AI", "Create images, video, audio, 3D, and more.", 15],
+    ["09-reinforcement-learning", "Phase 9 · Reinforcement Learning", "Agents that learn by doing. The foundation of RLHF.", 12],
+    ["10-llms-from-scratch", "Phase 10 · LLMs from Scratch", "Build, train, and understand large language models.", 24],
+    ["11-llm-engineering", "Phase 11 · LLM Engineering", "Put LLMs to work in production applications.", 17],
+    ["12-multimodal-ai", "Phase 12 · Multimodal AI", "Models that see, hear, read, and reason across modalities.", 25],
+    ["13-tools-and-protocols", "Phase 13 · Tools & Protocols", "The interfaces between AI and the real world.", 31],
+    ["14-agent-engineering", "Phase 14 · Agent Engineering", "The core of modern AI engineering. Build agents from first principles.", 54],
+    ["15-autonomous-systems", "Phase 15 · Autonomous Systems", "Agents that run without human intervention, safely.", 22],
+    ["16-multi-agent-and-swarms", "Phase 16 · Multi-Agent & Swarms", "Coordination, emergence, and collective intelligence.", 25],
+    ["17-infrastructure-and-production", "Phase 17 · Infrastructure & Production", "Ship AI to the real world. Scale, monitor, optimize.", 28],
+    ["18-ethics-safety-alignment", "Phase 18 · Ethics, Safety & Alignment", "Build AI that helps humanity. Not optional.", 30],
+    ["19-capstone-projects", "Phase 19 · Capstone Projects", "Prove everything you learned. Build portfolio-grade systems.", 85]
+  ];
+
+  var tracks = [
+    ["agentic-ai-engineer", "Agentic AI Engineer"],
+    ["applied-ai-engineer", "Applied AI Engineer (LLM Product)"],
+    ["ai-data-engineer", "AI Data Engineer"],
+    ["ai-evaluation-reliability-engineer", "AI Evaluation & Reliability Engineer"],
+    ["ai-developer-relations-engineer", "AI Developer Relations Engineer"],
+    ["forward-deployed-ai-engineer", "Forward-Deployed AI Engineer"],
+    ["model-context-protocol", "Model Context Protocol (MCP)"],
+    ["agent-skills", "Agent Skills Engineering"],
+    ["building-and-deploying-ai-applications", "Building & Deploying AI Applications"],
+    ["software-engineering-fundamentals", "Software Engineering Fundamentals"],
+    ["using-coding-agents", "Agent-Assisted Engineering"],
+    ["shaping-the-build", "Product Judgment & Delivery"]
+  ];
+
+  var maxLessons = Math.max.apply(null, phases.map(function (p) { return p[3]; }));
+
+  function loadDone() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+    } catch (e) {
+      return {};
+    }
+  }
+  function saveDone(done) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(done)); } catch (e) {}
+  }
+
+  var done = loadDone();
+  var listEl = document.getElementById("phaseList");
+  var tableEl = document.getElementById("tableBody");
+
+  phases.forEach(function (p, i) {
+    var slug = p[0], title = p[1], desc = p[2], count = p[3];
+    var pct = Math.round((count / maxLessons) * 100);
+
+    var row = document.createElement("div");
+    row.className = "phase-row" + (done[slug] ? " done" : "");
+    row.innerHTML =
+      '<div class="phase-check" data-slug="' + slug + '" role="checkbox" aria-checked="' + (!!done[slug]) + '" tabindex="0" title="Mark phase complete">' +
+        (done[slug] ? "✓" : "") +
+      '</div>' +
+      '<div class="phase-main">' +
+        '<div class="phase-title-row"><span class="phase-num">' + String(i).padStart(2, "0") + '</span><span class="phase-title">' + title.split("· ")[1] + '</span></div>' +
+        '<div class="phase-desc">' + desc + '</div>' +
+        '<div class="phase-bar-row">' +
+          '<div class="phase-bar-track"><div class="phase-bar-fill" style="width:' + pct + '%"></div></div>' +
+          '<div class="phase-bar-value">' + count + ' lessons</div>' +
+        '</div>' +
+      '</div>' +
+      '<a class="phase-link" href="' + REPO + slug + '" target="_blank" rel="noopener">Open ↗</a>';
+    listEl.appendChild(row);
+
+    var tr = document.createElement("tr");
+    tr.innerHTML = '<td>' + String(i).padStart(2, "0") + '</td><td>' + title.replace(/^Phase \d+ · /, "") + '</td><td class="num">' + count + '</td>';
+    tableEl.appendChild(tr);
+  });
+
+  var trackList = document.getElementById("trackList");
+  tracks.forEach(function (t) {
+    var a = document.createElement("a");
+    a.className = "track-chip";
+    a.href = "https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/learning-paths/" + t[0] + ".json";
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.textContent = t[1];
+    trackList.appendChild(a);
+  });
+
+  function updateProgress() {
+    var total = phases.length;
+    var completed = phases.filter(function (p) { return done[p[0]]; }).length;
+    var pct = Math.round((completed / total) * 100);
+    document.getElementById("progressFigure").textContent = pct + "%";
+    document.getElementById("progressCount").textContent = completed + " / " + total;
+    document.getElementById("progressFill").style.width = pct + "%";
+  }
+
+  function toggle(slug) {
+    done[slug] = !done[slug];
+    saveDone(done);
+    var el = document.querySelector('.phase-check[data-slug="' + slug + '"]');
+    var row = el.closest(".phase-row");
+    row.classList.toggle("done", !!done[slug]);
+    el.setAttribute("aria-checked", !!done[slug]);
+    el.textContent = done[slug] ? "✓" : "";
+    updateProgress();
+  }
+
+  listEl.addEventListener("click", function (e) {
+    var el = e.target.closest(".phase-check");
+    if (el) toggle(el.getAttribute("data-slug"));
+  });
+  listEl.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === " ") {
+      var el = e.target.closest(".phase-check");
+      if (el) { e.preventDefault(); toggle(el.getAttribute("data-slug")); }
+    }
+  });
+
+  document.getElementById("resetProgress").addEventListener("click", function () {
+    done = {};
+    saveDone(done);
+    document.querySelectorAll(".phase-row").forEach(function (row) {
+      row.classList.remove("done");
+      var chk = row.querySelector(".phase-check");
+      chk.textContent = "";
+      chk.setAttribute("aria-checked", "false");
+    });
+    updateProgress();
+  });
+
+  var themeBtn = document.getElementById("themeToggle");
+  function currentTheme() {
+    return document.documentElement.getAttribute("data-theme");
+  }
+  themeBtn.addEventListener("click", function () {
+    var next = currentTheme() === "light" ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("aefs-dashboard-theme", next); } catch (e) {}
+  });
+  try {
+    var saved = localStorage.getItem("aefs-dashboard-theme");
+    if (saved) document.documentElement.setAttribute("data-theme", saved);
+  } catch (e) {}
+
+  updateProgress();
+})();
+</script>
+</body>
+</html>
