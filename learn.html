@@ -20,7 +20,6 @@
     --series-1-light: #1c5cab; /* deeper step for hover */
     --good: #0ca30c;
     --card: #141413;
-    --added: #d95926;
   }
   @media (prefers-color-scheme: light) {
     :root:not([data-theme="dark"]) {
@@ -37,7 +36,6 @@
       --series-1-light: #6da7ec;
       --good: #0ca30c;
       --card: #ffffff;
-      --added: #eb6834;
     }
   }
   :root[data-theme="light"] {
@@ -54,7 +52,6 @@
     --series-1-light: #6da7ec;
     --good: #0ca30c;
     --card: #ffffff;
-    --added: #eb6834;
   }
   * { box-sizing: border-box; }
   body {
@@ -142,46 +139,6 @@
   }
   .track-chip:hover { color: var(--text-primary); border-color: var(--series-1); }
 
-  .roadmap-intro { font-size: 13px; color: var(--text-secondary); line-height: 1.55; max-width: 72ch; margin: 0 0 12px; }
-  .roadmap-intro a { color: var(--text-primary); }
-  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--text-secondary); margin: 0 0 14px; }
-  .tag { display: inline-flex; align-items: center; gap: 6px; }
-  .tag::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); }
-  .tag-v::before { background: var(--series-1); }
-  .tag-a::before { background: var(--added); }
-  .roadmap-panel { margin-bottom: 14px; }
-
-  .stage-list { display: flex; flex-direction: column; gap: 10px; }
-  .stage {
-    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-    padding: 14px; display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start;
-  }
-  .stage.done { border-color: var(--good); }
-  .stage-check {
-    width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border);
-    background: var(--track); display: flex; align-items: center; justify-content: center;
-    cursor: pointer; font-size: 14px; font-weight: 600; color: var(--text-secondary);
-    user-select: none; font-variant-numeric: tabular-nums;
-  }
-  .stage.done .stage-check { background: var(--good); border-color: var(--good); color: #fff; }
-  .stage-body { min-width: 0; }
-  .stage-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; }
-  .stage-title { font-size: 15px; font-weight: 600; }
-  .stage-meta { font-size: 12px; color: var(--text-muted); }
-  .stage-why { font-size: 13px; color: var(--text-secondary); line-height: 1.55; margin: 6px 0 0; max-width: 70ch; }
-  .stage-label { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); margin: 12px 0 6px; }
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-  .lesson-chip {
-    font-size: 12px; padding: 4px 10px; border: 1px solid var(--border); border-radius: 999px;
-    color: var(--text-secondary); text-decoration: none;
-  }
-  .lesson-chip:hover { color: var(--text-primary); border-color: var(--series-1); }
-  .stage details { margin-top: 12px; font-size: 12.5px; color: var(--text-secondary); }
-  .stage details summary { cursor: pointer; }
-  .stage details ol, .stage details ul { margin: 8px 0 0; padding-left: 20px; line-height: 1.6; }
-  .stage-note { font-size: 13px; line-height: 1.55; margin: 10px 0 0; max-width: 70ch; color: var(--text-secondary); }
-  .stage-note .tag { margin-right: 4px; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
-
   footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-muted); }
   footer a { color: var(--text-secondary); }
 
@@ -198,8 +155,6 @@
     <span class="brand">AI Interviewer</span>
     <div style="display:flex; align-items:center; flex-wrap:wrap; gap:8px 14px;">
       <a href="index.html">&larr; Back to app</a>
-      <a href="#roadmap">Roadmap</a>
-      <a href="#phases">Phases</a>
       <a href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">Source repo ↗</a>
       <button class="themebtn" id="themeToggle" type="button">Toggle theme</button>
     </div>
@@ -211,9 +166,7 @@
       A single page to track your progress through
       <a href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">rohitg00/ai-engineering-from-scratch</a>,
       an open-source, MIT-licensed curriculum that takes you from math foundations to
-      multi-agent production systems — end to end, by building. Start with the
-      <a href="#roadmap">merged roadmap</a>: it orders the curriculum the way a 2026
-      AI-engineer roadmap video recommends, then sends you into the lessons.
+      multi-agent production systems — end to end, by building.
     </p>
     <p class="credit">
       Curriculum and lesson content © the
@@ -241,31 +194,7 @@
     <button class="reset" id="resetProgress" type="button">Reset progress</button>
   </section>
 
-  <h2 class="section-title" id="roadmap">Merged roadmap: applied AI engineer, 2026</h2>
-  <p class="roadmap-intro">
-    Order and priorities come from
-    <a href="https://youtu.be/ZSOecQCdea4" target="_blank" rel="noopener">“The Complete AI Engineer Roadmap for 2026”</a>
-    (Bashi Smith, Aug 2026): five skill categories, applied-first, with a checkpoint project after each.
-    The lessons come from the curriculum, so every stage has hands-on depth. Salary and demand figures in the
-    video are the creator’s claims and are not verified here. Items the video keeps for its paid community
-    (checkpoint projects, mentor lectures) are left out. Pacing assumes about 10 hours a week and is my estimate.
-  </p>
-  <div class="legend">
-    <span class="tag tag-v">From the video</span>
-    <span class="tag tag-c">Curriculum lessons</span>
-    <span class="tag tag-a">Added by me</span>
-  </div>
-  <section class="progress-panel roadmap-panel">
-    <div class="figure" id="roadmapFigure">0</div>
-    <div class="meter-wrap">
-      <div class="meter-label"><span>Stages complete</span><span id="roadmapCount">0 / 8</span></div>
-      <div class="meter-track"><div class="meter-fill" id="roadmapFill" style="width:0%"></div></div>
-    </div>
-    <button class="reset" id="resetRoadmap" type="button">Reset roadmap</button>
-  </section>
-  <div class="stage-list" id="stageList"></div>
-
-  <h2 class="section-title" id="phases">Curriculum, phase by phase</h2>
+  <h2 class="section-title">Curriculum, phase by phase</h2>
   <p class="section-sub">
     Bar length shows lesson count per phase (523 total). Tap the circle to mark a phase
     complete as you go — the summary above updates from your local checkmarks.
@@ -289,9 +218,7 @@
     Built on top of
     <a href="https://github.com/rohitg00/ai-engineering-from-scratch" target="_blank" rel="noopener">rohitg00/ai-engineering-from-scratch</a>
     (MIT License) · live course site:
-    <a href="https://aiengineeringfromscratch.com" target="_blank" rel="noopener">aiengineeringfromscratch.com</a> ·
-    roadmap order from
-    <a href="https://youtu.be/ZSOecQCdea4" target="_blank" rel="noopener">Bashi Smith’s 2026 AI engineer roadmap</a>
+    <a href="https://aiengineeringfromscratch.com" target="_blank" rel="noopener">aiengineeringfromscratch.com</a>
   </footer>
 </div>
 
@@ -434,251 +361,6 @@
     });
     updateProgress();
   });
-
-  var ROADMAP_KEY = "aefs-roadmap-progress-v1";
-
-  var stages = [
-    {
-      id: "s0", n: 0, title: "Engineering baseline", cat: "Prerequisite", pace: "1–2 wk",
-      why: "The video’s starting point: AI engineering is a progressive adaptation of software engineering, and most roles ask for 2–5 years of production experience. If you can already ship and debug a service, skim this. If not, build this base first.",
-      lessons: [
-        ["00-setup-and-tooling/01-dev-environment", "Dev environment"],
-        ["00-setup-and-tooling/02-git-and-collaboration", "Git & collaboration"],
-        ["00-setup-and-tooling/04-apis-and-keys", "APIs & keys"],
-        ["00-setup-and-tooling/07-docker-for-ai", "Docker for AI"],
-        ["00-setup-and-tooling/12-debugging-and-profiling", "Debugging & profiling"]
-      ],
-      added: "Containerize a small Python service that calls an LLM API, with tests and a GitHub Actions workflow. The Software Engineering Fundamentals path below goes wider if you need it."
-    },
-    {
-      id: "s1", n: 1, title: "LLMs & RAG", cat: "Category 1", pace: "4–6 wk",
-      why: "The deepest foundation. The video says retrieval-augmented generation shows up in almost 40% of AI engineering job descriptions. Order: LLM basics, prompt and context engineering, LLM APIs, embeddings, vector databases, basic RAG, chunking, then advanced retrieval.",
-      lessons: [
-        ["11-llm-engineering/01-prompt-engineering", "Prompt engineering"],
-        ["11-llm-engineering/03-structured-outputs", "Structured outputs"],
-        ["11-llm-engineering/05-context-engineering", "Context engineering"],
-        ["11-llm-engineering/04-embeddings", "Embeddings"],
-        ["05-nlp-foundations-to-advanced/22-embedding-models-deep-dive", "Embedding models"],
-        ["11-llm-engineering/06-rag", "RAG"],
-        ["05-nlp-foundations-to-advanced/23-chunking-strategies-rag", "Chunking strategies"],
-        ["11-llm-engineering/07-advanced-rag", "Advanced RAG"],
-        ["19-capstone-projects/65-hybrid-retrieval-bm25-dense", "Hybrid retrieval"],
-        ["19-capstone-projects/66-reranker-cross-encoder", "Reranker"]
-      ],
-      resources: [
-        "Intro to LLMs — the video calls it the best one on the internet",
-        "Hugging Face LLM course (transformers, fine-tuning, tokenizers, datasets)",
-        "Prompt and context engineering: Tech with Tim video, DeepLearning.AI prompt engineering course",
-        "LLM APIs: DeepLearning.AI “Building Systems with the ChatGPT API”, plus a Claude / OpenAI / Gemini API tutorial",
-        "Embeddings: StatQuest “Word Embedding and Word2Vec” (about 16 min), DeepLearning.AI “Understanding and Applying Text Embeddings”",
-        "Vector databases: IBM “What is a vector database” (9 min), DeepLearning.AI “Vector Databases: from Embeddings to Applications”",
-        "Basic RAG: freeCodeCamp “Learn RAG from Scratch” (about 2.5 h), DeepLearning.AI “LangChain: Chat with Your Data”",
-        "Chunking: Greg Kamradt “The 5 Levels of Text Splitting for Retrieval”, DeepLearning.AI “Preprocessing Unstructured Data for LLM Applications”",
-        "Advanced retrieval (hybrid, agentic): DeepLearning.AI “Advanced Retrieval for AI with Chroma”"
-      ],
-      build: "A RAG chatbot with hybrid retrieval and at least two chunking strategies you can compare. Keep it: Stages 2 and 3 extend this same project.",
-      added: "When the applied path clicks, go deeper on how models work with Phase 7 (Transformers) and Phase 10 (LLMs from Scratch)."
-    },
-    {
-      id: "s2", n: 2, title: "Agents, integration & orchestration", cat: "Category 2", pace: "5–7 wk",
-      why: "Start with a tool-using agent, then validate its outputs, then learn design patterns. The video stresses that building an agent is easy now; choosing the right pattern is the skill. Then orchestration, multi-agent, memory, agentic RAG, and MCP.",
-      lessons: [
-        ["14-agent-engineering/01-the-agent-loop", "The agent loop"],
-        ["14-agent-engineering/06-tool-use-and-function-calling", "Tool use"],
-        ["14-agent-engineering/12-anthropic-workflow-patterns", "Workflow patterns"],
-        ["14-agent-engineering/28-orchestration-patterns", "Orchestration patterns"],
-        ["14-agent-engineering/13-langgraph-stateful-graphs", "LangGraph"],
-        ["14-agent-engineering/15-crewai-role-based-crews", "CrewAI"],
-        ["16-multi-agent-and-swarms/05-supervisor-orchestrator-pattern", "Supervisor pattern"],
-        ["14-agent-engineering/09-hybrid-memory-mem0", "Agent memory (Mem0)"],
-        ["13-tools-and-protocols/06-mcp-fundamentals", "MCP fundamentals"],
-        ["13-tools-and-protocols/07-building-an-mcp-server", "Build an MCP server"]
-      ],
-      resources: [
-        "Tool-use agent: DeepLearning.AI “Functions, Tools and Agents with LangChain”",
-        "Structured output and validation: Instructor + Pydantic video, DeepLearning.AI “Getting Structured LLM Output”",
-        "LLM apps with frameworks: go deeper on LangChain",
-        "Agent fundamentals: IBM “What are AI agents?”, Hugging Face Agents course",
-        "Design patterns: a 1-hour video on 20 agentic design patterns, DeepLearning.AI “Agentic AI” by Andrew Ng (about 9 h, free to audit)",
-        "Orchestration: Tech with Tim LangGraph tutorial, DeepLearning.AI “AI Agents in LangGraph”",
-        "Multi-agent: DeepLearning.AI “Multi AI Agent Systems with crewAI”",
-        "Memory and state: a long-term memory with LangGraph and Mem0 video, DeepLearning.AI “Long-Term Agentic Memory with LangGraph”",
-        "Agentic RAG: “Building Agentic RAG from scratch in pure Python” (about 27 min)",
-        "MCP: a short “MCP under the hood” explainer, Hugging Face MCP course"
-      ],
-      build: "Add agents to your Stage 1 RAG project: tool use, structured outputs, long-term memory. Build cumulatively instead of starting a new toy each time.",
-      added: "The video says MCP can move to the front if you don’t know it yet. Phase 13 goes far deeper on MCP than the video’s resources do."
-    },
-    {
-      id: "s3", n: 3, title: "Ops & evaluation", cat: "Category 3", pace: "4–6 wk",
-      why: "Many learners skip this. The video’s point: unlike classic software teams with a separate DevOps group, in AI engineering the ops, evaluation and testing are the AI engineer’s job, so learning it puts you ahead.",
-      lessons: [
-        ["11-llm-engineering/13-production-app", "Production app"],
-        ["11-llm-engineering/11-caching-cost", "Caching & cost"],
-        ["17-infrastructure-and-production/04-vllm-serving-internals", "vLLM serving"],
-        ["17-infrastructure-and-production/13-llm-observability", "LLM observability"],
-        ["11-llm-engineering/10-evaluation", "Evaluation"],
-        ["05-nlp-foundations-to-advanced/27-llm-evaluation-frameworks", "Eval frameworks"],
-        ["19-capstone-projects/68-rag-eval-precision-recall", "RAG eval"],
-        ["14-agent-engineering/30-eval-driven-agent-development", "Eval-driven agents"],
-        ["14-agent-engineering/19-benchmarks-swebench-gaia", "Benchmarks"]
-      ],
-      resources: [
-        "LLMOps: IBM overview video, DeepLearning.AI LLMOps course",
-        "Serving open-source models: a vLLM talk, DeepLearning.AI “Efficiently Serving LLMs”",
-        "Deploying LLM applications: a 1 h 41 min course video with a GitHub repo",
-        "Observability and monitoring: the LangChain observability course, DeepLearning.AI “Evaluating and Debugging Generative AI”",
-        "CI/CD for LLM apps: Arize AI docs and course",
-        "Evaluation methods: “LLM Evaluation: A Beginner’s Guide”, Arize’s definitive guide",
-        "LLM-as-a-judge: Elvis Saravia’s 7-minute video and a how-to post",
-        "RAG evaluation: IBM guide using RAGAS, DeepLearning.AI “Building and Evaluating Advanced RAG”",
-        "Agent evals: an “Evaluating AI Agents” course, Anthropic’s “Demystifying evals for AI agents”",
-        "Benchmarking: an LLM benchmarks explainer and the lm-evaluation-harness repo"
-      ],
-      build: "Deploy the RAG + agent app from Stages 1–2 and evaluate it: retrieval quality, an LLM-as-a-judge check, and an agent eval.",
-      added: "The curriculum covers serving, observability and evals well, but CI/CD for LLM apps is thin. Lean on the video’s Arize material for that."
-    },
-    {
-      id: "s4", n: 4, title: "Safety & ethics", cat: "Category 4", pace: "2–3 wk",
-      why: "Light on building, heavy on understanding. The video calls this the differentiator: responsible AI, data ethics and bias, LLM security, guardrails, governance. Its advice: have Claude or ChatGPT interview you on safety and ethics, and see how you do.",
-      lessons: [
-        ["11-llm-engineering/12-guardrails", "Guardrails"],
-        ["14-agent-engineering/27-prompt-injection-defense", "Prompt-injection defense"],
-        ["18-ethics-safety-alignment/15-indirect-prompt-injection", "Indirect injection"],
-        ["18-ethics-safety-alignment/12-red-teaming-pair-automated-attacks", "Red teaming"],
-        ["13-tools-and-protocols/15-mcp-security-tool-poisoning", "MCP tool poisoning"],
-        ["19-capstone-projects/83-prompt-injection-detector", "Injection detector"]
-      ],
-      resources: [
-        "Responsible AI: Google Cloud responsible AI pages, Coursera “Responsible AI: Applying AI Principles” (free to audit)",
-        "Data ethics and bias: a video course",
-        "LLM security and risk: a downloadable security guide, plus a hands-on “Red Teaming LLM Applications” course",
-        "Guardrails: NeMo Guardrails crash course (with GitHub repo)",
-        "Prompt injection: OWASP prevention cheat sheet",
-        "AI governance: EU-focused material if you build for the EU",
-        "A free AI safety, ethics and society book — the video says interview questions come from this kind of material"
-      ],
-      build: "Self-interview: prompt an LLM to interview you on safety and ethics, then fix your weak spots.",
-      added: "Add input and output guardrails plus a prompt-injection test suite to your project. Phase 18 has the deeper alignment theory."
-    },
-    {
-      id: "s5", n: 5, title: "ML foundations, time-boxed", cat: "Category 5", pace: "up to 12 wk",
-      why: "The video’s controversial take: you don’t need to master machine learning to be a well-paid applied AI engineer. Spend no more than about three months unless you love it. It covers ML basics, scikit-learn, data quality, then MLflow, DVC, CI/CD and monitoring.",
-      lessons: [
-        ["02-ml-fundamentals/09-model-evaluation", "Model evaluation"],
-        ["02-ml-fundamentals/10-bias-variance", "Bias & variance"],
-        ["01-math-foundations", "Phase 1 · Math"],
-        ["02-ml-fundamentals", "Phase 2 · ML fundamentals"],
-        ["03-deep-learning-core", "Phase 3 · Deep learning"]
-      ],
-      resources: [
-        "StatQuest ML fundamentals (start with bias and variance), an ML crash course",
-        "scikit-learn docs",
-        "Data engineering and quality: ETL vs ELT, DataCamp on data validation",
-        "Experiment tracking: MLflow docs, and the staging-to-production model lifecycle",
-        "Data versioning: DVC intro video and docs",
-        "CI/CD for models with DVC — the video’s task: build a GitHub Actions workflow",
-        "Monitoring ML in production: Evidently AI course (lifecycle, monitoring pipelines, dashboards)"
-      ],
-      build: "A small model of your own that the next stage’s capstone wraps in RAG and an agent.",
-      added: "The video puts this last. I’d pull bias/variance and model evaluation (Phase 2, lessons 09–10) forward to before Stage 3, because evals lean on them. The curriculum barely covers MLflow, DVC or ML monitoring, so use the video’s resources for those."
-    },
-    {
-      id: "s6", n: 6, title: "Integrated capstone", cat: "Video: closing project", pace: "3–4 wk",
-      why: "The video’s closing project, one repo: a small model, RAG on top, an agent, evaluations, deployment, and a safety pass. For new graduates with no experience, it says a resume project that solves a real problem matters most; experienced engineers can treat it as optional.",
-      lessons: [
-        ["19-capstone-projects/08-production-rag-chatbot", "Production RAG chatbot"],
-        ["19-capstone-projects/11-llm-observability-dashboard", "Observability dashboard"],
-        ["19-capstone-projects/83-prompt-injection-detector", "Injection detector"],
-        ["19-capstone-projects/07-end-to-end-fine-tuning-pipeline", "Fine-tuning pipeline"]
-      ],
-      added: "Pick a real problem from your background or a local business so the project reads as impact, not a tutorial. Use these Phase 19 capstones as scaffolding."
-    },
-    {
-      id: "s7", n: 7, title: "Career launch", cat: "Video: final third", pace: "start during Stage 4",
-      why: "Two routes in the video. No engineering experience: build one impactful resume project. Already an engineer or analyst: rewrite your resume and profiles so they read as AI engineering, with AI keywords in existing job bullets, AI-specific projects and open source, and an AI Engineer summary line, without inventing experience.",
-      steps: [
-        "Update your resume and LinkedIn so both read as AI engineering (the video links a resume template in its description).",
-        "Prep for the AI interview loop: more system design, AI-assisted coding and work trials, less LeetCode.",
-        "Apply in volume: referrals, messages to hiring managers, warm and cold leads.",
-        "Review all five categories as interview questions; safety and ethics comes up."
-      ],
-      added: "Each role-based path below ends with an “Interview and Readiness Evidence” step. Use the one closest to your target job."
-    }
-  ];
-
-  var rdone = {};
-  try { rdone = JSON.parse(localStorage.getItem(ROADMAP_KEY) || "{}"); } catch (e) { rdone = {}; }
-
-  var stageListEl = document.getElementById("stageList");
-  stages.forEach(function (s) {
-    var chips = (s.lessons || []).map(function (l) {
-      return '<a class="lesson-chip" href="' + REPO + l[0] + '" target="_blank" rel="noopener">' + l[1] + '</a>';
-    }).join("");
-    var list = function (items, tag) {
-      return '<' + tag + '>' + items.map(function (r) { return '<li>' + r + '</li>'; }).join("") + '</' + tag + '>';
-    };
-    var html =
-      '<div class="stage-head"><span class="stage-title">' + s.title + '</span>' +
-      '<span class="stage-meta">' + s.cat + ' · about ' + s.pace + '</span></div>' +
-      '<p class="stage-why">' + s.why + '</p>';
-    if (chips) html += '<div class="stage-label">Curriculum lessons</div><div class="chips">' + chips + '</div>';
-    if (s.resources) html += '<details><summary>Video resources (' + s.resources.length + ', in the video’s order)</summary>' + list(s.resources, "ol") + '</details>';
-    if (s.steps) html += '<div class="stage-label">Steps from the video</div>' + list(s.steps, "ul");
-    if (s.build) html += '<p class="stage-note"><span class="tag tag-v">Build</span>' + s.build + '</p>';
-    if (s.added) html += '<p class="stage-note"><span class="tag tag-a">Added</span>' + s.added + '</p>';
-
-    var el = document.createElement("div");
-    el.className = "stage" + (rdone[s.id] ? " done" : "");
-    el.innerHTML =
-      '<div class="stage-check" data-stage="' + s.id + '" data-n="' + s.n + '" role="checkbox" aria-checked="' + (!!rdone[s.id]) +
-      '" tabindex="0" title="Mark stage complete">' + (rdone[s.id] ? "✓" : s.n) + '</div>' +
-      '<div class="stage-body">' + html + '</div>';
-    stageListEl.appendChild(el);
-  });
-
-  function updateRoadmap() {
-    var total = stages.length;
-    var completed = stages.filter(function (s) { return rdone[s.id]; }).length;
-    document.getElementById("roadmapFigure").textContent = completed;
-    document.getElementById("roadmapCount").textContent = completed + " / " + total;
-    document.getElementById("roadmapFill").style.width = Math.round((completed / total) * 100) + "%";
-  }
-
-  function toggleStage(chk) {
-    var id = chk.getAttribute("data-stage");
-    rdone[id] = !rdone[id];
-    try { localStorage.setItem(ROADMAP_KEY, JSON.stringify(rdone)); } catch (e) {}
-    chk.closest(".stage").classList.toggle("done", !!rdone[id]);
-    chk.setAttribute("aria-checked", !!rdone[id]);
-    chk.textContent = rdone[id] ? "✓" : chk.getAttribute("data-n");
-    updateRoadmap();
-  }
-
-  stageListEl.addEventListener("click", function (e) {
-    var chk = e.target.closest(".stage-check");
-    if (chk) toggleStage(chk);
-  });
-  stageListEl.addEventListener("keydown", function (e) {
-    if (e.key === "Enter" || e.key === " ") {
-      var chk = e.target.closest(".stage-check");
-      if (chk) { e.preventDefault(); toggleStage(chk); }
-    }
-  });
-
-  document.getElementById("resetRoadmap").addEventListener("click", function () {
-    rdone = {};
-    try { localStorage.setItem(ROADMAP_KEY, "{}"); } catch (e) {}
-    document.querySelectorAll(".stage").forEach(function (st) {
-      st.classList.remove("done");
-      var chk = st.querySelector(".stage-check");
-      chk.textContent = chk.getAttribute("data-n");
-      chk.setAttribute("aria-checked", "false");
-    });
-    updateRoadmap();
-  });
-
-  updateRoadmap();
 
   var themeBtn = document.getElementById("themeToggle");
   function currentTheme() {
